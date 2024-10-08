@@ -1,14 +1,15 @@
 package eu.pb4.styledchat.other;
 
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
+import net.neoforged.fml.ModContainer;
 
 import javax.imageio.ImageIO;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GenericModInfo {
@@ -23,7 +24,7 @@ public class GenericModInfo {
             final String chr = "█";
             var icon = new ArrayList<MutableText>();
             try {
-                var source = ImageIO.read(Files.newInputStream(container.getPath("assets/icon_small.png")));
+                var source = ImageIO.read(Objects.requireNonNull(GenericModInfo.class.getResourceAsStream("/assets/icon_small.png")));
 
                 for (int y = 0; y < source.getHeight(); y++) {
                     var base = Text.literal("");
@@ -61,17 +62,16 @@ public class GenericModInfo {
             var output = new ArrayList<Text>();
 
             try {
-                about.add(Text.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,container.getMetadata().getContact().get("github").orElse("")))));
+                about.add(Text.literal(container.getModInfo().getDisplayName()).setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/LostPattern/StyledChat"))));
                 about.add(Text.translatable("Version: ").setStyle(Style.EMPTY.withColor(0xf7e1a7))
-                        .append(Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
+                        .append(Text.literal(container.getModInfo().getVersion().toString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
 
                 aboutBasic.addAll(about);
                 aboutBasic.add(Text.empty());
-                aboutBasic.add(Text.of(container.getMetadata().getDescription()));
+                aboutBasic.add(Text.of(container.getModInfo().getDescription()));
 
                 var contributors = new ArrayList<String>();
-                contributors.addAll(container.getMetadata().getAuthors().stream().map((p) -> p.getName()).collect(Collectors.toList()));
-                contributors.addAll(container.getMetadata().getContributors().stream().map((p) -> p.getName()).collect(Collectors.toList()));
+                contributors.add((String) container.getModInfo().getConfig().getConfigElement("authors").get());
 
                 about.add(Text.literal("")
                         .append(Text.translatable("Contributors")
@@ -84,7 +84,7 @@ public class GenericModInfo {
                         .setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY)));
                 about.add(Text.empty());
 
-                var desc = new ArrayList<>(List.of(container.getMetadata().getDescription().split(" ")));
+                var desc = new ArrayList<>(List.of(container.getModInfo().getDescription().split(" ")));
 
                 if (desc.size() > 0) {
                     StringBuilder descPart = new StringBuilder();

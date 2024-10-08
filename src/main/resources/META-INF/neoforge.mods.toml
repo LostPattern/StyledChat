@@ -1,0 +1,25 @@
+modLoader="javafml" #mandatory
+
+loaderVersion="[1,)" #mandatory
+
+license="LGPLv3"
+
+[[mods]] #mandatory
+modId="styledchat" #mandatory
+version="${version}" #mandatory
+displayName="Styled Chat" #mandatory
+logoFile="assets/icon.png" #optional
+logoBlur=false
+authors="Patbox, LostPattern" #optional
+
+# The description text for the mod (multi line!) (#mandatory)
+description='''Change look of yours server chat!'''
+
+# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
+[[mixins]]
+config="styledchat.mixins.json"
+
+# The [[accessTransformers]] block allows you to declare where your AT file is.
+# If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
+#[[accessTransformers]]
+#file="META-INF/accesstransformer.cfg"

@@ -24,7 +24,6 @@ import eu.pb4.styledchat.ducks.ExtSignedMessage;
 import eu.pb4.styledchat.parser.LinkParser;
 import eu.pb4.styledchat.parser.MentionParser;
 import eu.pb4.styledchat.parser.SpoilerNode;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.network.message.MessageBody;
 import net.minecraft.network.message.MessageDecorator;
@@ -209,7 +208,7 @@ public final class StyledChatUtils {
             parser.register(SPOILER_TEXT_TAG);
         }
 
-        StyledChatEvents.FORMATTING_CREATION_EVENT.invoker().onFormattingBuild(source, parser);
+        //StyledChatEvents.FORMATTING_CREATION_EVENT.invoker().onFormattingBuild(source, parser);
 
         return parser;
     }
@@ -222,13 +221,13 @@ public final class StyledChatUtils {
         var parser = createParser(context);
         var config = ConfigManager.getConfig();
         if (StyledChatMod.USE_FABRIC_API) {
-            input = StyledChatEvents.PRE_MESSAGE_CONTENT.invoker().onPreMessage(input, context);
+            //input = StyledChatEvents.PRE_MESSAGE_CONTENT.invoker().onPreMessage(input, context);
         }
 
         var value = TextNode.asSingle(parser.parseNodes(new LiteralNode(input)));
 
         if (StyledChatMod.USE_FABRIC_API) {
-            value = StyledChatEvents.MESSAGE_CONTENT.invoker().onMessage(value, context);
+            //value = StyledChatEvents.MESSAGE_CONTENT.invoker().onMessage(value, context);
         }
 
         var text = value.toText(context);
@@ -435,7 +434,7 @@ public final class StyledChatUtils {
 
     public static void sendAutoCompletion(ServerPlayerEntity player, Collection<String> oldAutoCompletion) {
         var config = ConfigManager.getConfig();
-        player.networkHandler.sendPacket(new ChatSuggestionsS2CPacket(ChatSuggestionsS2CPacket.Action.REMOVE, new ArrayList<>(oldAutoCompletion)));
+        player.networkHandler.send(new ChatSuggestionsS2CPacket(ChatSuggestionsS2CPacket.Action.REMOVE, new ArrayList<>(oldAutoCompletion)));
 
         var set = new HashSet<String>();
 
@@ -461,7 +460,7 @@ public final class StyledChatUtils {
         }
 
         if (!set.isEmpty()) {
-            player.networkHandler.sendPacket(new ChatSuggestionsS2CPacket(ChatSuggestionsS2CPacket.Action.ADD, new ArrayList<>(set)));
+            player.networkHandler.send(new ChatSuggestionsS2CPacket(ChatSuggestionsS2CPacket.Action.ADD, new ArrayList<>(set)));
         }
     }
 

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6.+'
+	id 'dev.architectury.loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -13,7 +13,9 @@ targetCompatibility = JavaVersion.VERSION_21
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
-
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -23,7 +25,11 @@ repositories {
 	// for more information about repositories.
 
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-	maven { url 'https://maven.nucleoid.xyz' }
+	maven {
+		name = 'NeoForged'
+		url = 'https://maven.neoforged.net/releases'
+	}
+	maven { url = "https://maven.tterrag.com/" }
 	//maven { url 'https://maven.gegy.dev' }
 	maven { url "https://api.modrinth.com/maven" }
 	mavenLocal()
@@ -32,19 +38,18 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+	mappings loom.layered {
+		it.mappings("net.fabricmc:yarn:$project.yarn_mappings:v2")
+		it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$project.yarn_mappings_patch_version")
+	}
+	neoForge "net.neoforged:neoforge:$project.neoforge_version"
 
 	//modCompileOnly fabricApi.module("fabric-api-base", project.fabric_version)
 	//modLocalRuntime fabricApi.module("fabric-api-base", project.fabric_version)
 
-	modImplementation include("eu.pb4:predicate-api:0.5.1+1.21")
-	modImplementation include("eu.pb4:placeholder-api:2.4.0-pre.2+1.21")
-	modImplementation include("me.lucko:fabric-permissions-api:0.3.1")
-	modImplementation include("eu.pb4:player-data-api:0.6.0+1.21")
+	modImplementation include("eu.pb4:predicate-api:0.5.2-1.21-neo")
+	modImplementation include("eu.pb4:placeholder-api-lt:2.5.0+1.21")
+	modImplementation include("eu.pb4:player-data-api:0.6.0-1.21-neo")
 
 	modCompileOnly("maven.modrinth:vanish:1.5.2+1.20.4")
 	//modLocalRuntime("fr.catcore:server-translations-api:1.4.17+1.19.2")
@@ -54,19 +59,21 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 }
 
-loom {
-	enableTransitiveAccessWideners = false
-	interfaceInjection {
-		enableDependencyInterfaceInjection = false
-	}
-	accessWidenerPath = file("src/main/resources/styledchat.accesswidener")
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand version: project.version
 	}
 }
 

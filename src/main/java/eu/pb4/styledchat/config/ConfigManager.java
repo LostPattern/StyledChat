@@ -10,8 +10,8 @@ import eu.pb4.styledchat.StyledChatMod;
 import eu.pb4.styledchat.config.data.ConfigData;
 import eu.pb4.styledchat.config.data.VersionConfigData;
 import eu.pb4.styledchat.config.data.old.ConfigDataV2;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.registry.RegistryWrapper;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -43,7 +43,7 @@ public class ConfigManager {
                     .registerTypeHierarchyAdapter(MinecraftPredicate.class, GsonPredicateSerializer.create(lookup)).create();
 
             ConfigData config;
-            var configFile = FabricLoader.getInstance().getConfigDir().resolve("styled-chat.json");
+            var configFile = FMLPaths.CONFIGDIR.get().resolve("styled-chat.json");
 
             if (Files.exists(configFile)) {
                 String json = Files.readString(configFile, StandardCharsets.UTF_8);
@@ -52,7 +52,7 @@ public class ConfigManager {
 
                 if (versionConfigData.version < 3) {
                     config = gson.fromJson(json, ConfigDataV2.class).update();
-                    Files.writeString(FabricLoader.getInstance().getConfigDir().resolve("styled-chat.json_old_v2"), json, StandardCharsets.UTF_8);
+                    Files.writeString(FMLPaths.CONFIGDIR.get().resolve("styled-chat.json_old_v2"), json, StandardCharsets.UTF_8);
                 } else {
                     config = gson.fromJson(json, ConfigData.class);
                 }
@@ -77,7 +77,7 @@ public class ConfigManager {
     }
 
     public static JsonObject loadJson(String key) {
-        var path = FabricLoader.getInstance().getConfigDir().resolve(key);
+        var path = FMLPaths.CONFIGDIR.get().resolve(key);
         if (Files.exists(path)) {
             try {
                 return JsonParser.parseReader(Files.newBufferedReader(path)).getAsJsonObject();
@@ -89,14 +89,12 @@ public class ConfigManager {
     }
 
     public static JsonObject loadJsonBuiltin(String baseValue) {
-        var path = StyledChatMod.CONTAINER.findPath("emoji/" + baseValue + ".json");
-        if (path.isPresent()) {
-            try {
-                return JsonParser.parseReader(Files.newBufferedReader(path.get())).getAsJsonObject();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+        try {
+            return JsonParser.parseString(new String(ConfigManager.class.getResourceAsStream("/emoji/" + baseValue + ".json").readAllBytes())).getAsJsonObject();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
+
         return new JsonObject();
 
     }

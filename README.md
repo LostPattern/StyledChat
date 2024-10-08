@@ -1,3 +1,10 @@
+# UNOFFICIAL NEOFORGE PORT
+This is unofficial neoforge port of Styled Chat mod by Patbox.
+Do not report any issues to Patbox, their discord or github.
+
+You can find official/fabric version here https://www.curseforge.com/minecraft/mc-mods/styled-chat
+
+
 ![Logo](https://i.imgur.com/QxkDhm0.png)
 # Styled Chat
 It's a simple mod that allows server owners to change how their chat looks!
@@ -8,12 +15,6 @@ but ignored by many chat mods/plugins.
 It's also compatible with any mods using [Placeholder API](https://placeholders.pb4.eu/user/general/).
 
 It also supports changing style per player with permissions (supports LuckPerms and PlayerRoles)
-
-*This mod works only on Fabric Mod Loader and compatible!*
-
-If you have any questions, you can ask them on my [Discord](https://pb4.eu/discord)
-
-[Also check out my other mods and project, as you might find them useful!](https://pb4.eu)
 
 ![Example image](https://i.imgur.com/HPSMaS8.png)
 ![Example image2](https://i.imgur.com/mSWzIV4.png)

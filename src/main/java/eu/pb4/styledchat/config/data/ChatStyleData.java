@@ -3,9 +3,12 @@ package eu.pb4.styledchat.config.data;
 
 import com.google.gson.annotations.SerializedName;
 import eu.pb4.styledchat.StyledChatUtils;
-import me.lucko.fabric.api.permissions.v0.Options;
+import eu.pb4.styledchat.mixin.PermissionAPIAccessor;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
+import net.neoforged.neoforge.server.permission.PermissionAPI;
+import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
+import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -104,12 +107,15 @@ public class ChatStyleData implements Cloneable {
 
 
     public void fillPermissionOptionProvider(ServerCommandSource source) {
+        if (source.getPlayer() == null) {
+            return;
+        }
+
         for (var prop : PROPERTIES.entrySet()) {
             if (prop.getValue().get(this) == null) {
-                var value = Options.get(source, "styled_chat." + prop.getKey());
-
-                if (value.isPresent()) {
-                    prop.getValue().set(this, value.get());
+                var value = PermissionAPIAccessor.getActiveHandler().getPermission(source.getPlayer(), new PermissionNode<>("styled_chat", prop.getKey(), PermissionTypes.STRING, ((arg, uUID, permissionDynamicContexts) -> "")));
+                if (!value.isEmpty()) {
+                    prop.getValue().set(this, value);
                 }
             }
         }

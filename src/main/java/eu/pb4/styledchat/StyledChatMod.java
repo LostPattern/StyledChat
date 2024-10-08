@@ -4,22 +4,27 @@ import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.playerdata.api.PlayerDataApi;
 import eu.pb4.styledchat.config.ConfigManager;
 import eu.pb4.styledchat.other.GenericModInfo;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-public class StyledChatMod implements ModInitializer {
+@Mod("styledchat")
+public class StyledChatMod {
 	public static final Logger LOGGER = LogManager.getLogger("Styled Chat");
-	public static final ModContainer CONTAINER = FabricLoader.getInstance().getModContainer("styledchat").get();
 	public static MinecraftServer server = null;
 
 	public static boolean USE_FABRIC_API = true;
@@ -30,10 +35,9 @@ public class StyledChatMod implements ModInitializer {
 		return server.getRegistryManager().get(RegistryKeys.MESSAGE_TYPE).getOrThrow(MESSAGE_TYPE_ID);
 	}
 
-	@Override
-	public void onInitialize() {
-		this.crabboardDetection();
-		GenericModInfo.build(CONTAINER);
+	public StyledChatMod(IEventBus modBus, ModContainer container) {
+		crabboardDetection();
+		GenericModInfo.build(container);
 		PlayerDataApi.register(StyledChatUtils.PLAYER_DATA);
 		Placeholders.registerChangeEvent((id, removed) -> ConfigManager.clearCached());
 	}
@@ -51,7 +55,7 @@ public class StyledChatMod implements ModInitializer {
 
 
 	private static void crabboardDetection() {
-		if (FabricLoader.getInstance().isModLoaded("cardboard")) {
+		if (ModList.get().isLoaded("cardboard")) {
 			LOGGER.error("");
 			LOGGER.error("Cardboard detected! This mod doesn't work with it!");
 			LOGGER.error("You won't get any support as long as it's present!");
